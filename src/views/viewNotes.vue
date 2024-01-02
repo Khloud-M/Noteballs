@@ -1,69 +1,51 @@
 <template>
-  <div class="container has-background-success-dark p-4 mb-5">
-    <div class="field">
-      <div class="control">
-        <textarea
-          class="textarea"
-          placeholder="add new note"
-          v-model="newNote"
-          ref="newNoteRef"
-        />
-      </div>
-    </div>
-    <div class="field is-grouped is-grouped-right">
-      <div class="control">
+  <div class="notes">
+    <AddEditNote
+      v-model="newNote"
+      placeholder="Add a new note"
+      ref="addEditNoteRef"
+    >
+      <template #buttons>
         <button
-          class="button is-link is-success"
+          @click="addNote"
           :disabled="!newNote"
-          @click="addnewNote"
+          class="button is-link has-background-success"
         >
-          Add new note
+          Add New Note
         </button>
-      </div>
-    </div>
+      </template>
+    </AddEditNote>
+    <p>jh</p>
+    <Note v-for="note in storeNotes.notes" :key="note.id" :note="note" />
   </div>
-  <Note
-    v-for="note in notes"
-    :key="note.id"
-    :note="note"
-    @deleteClick="deleteNote"
-  />
 </template>
-<script setup>
-// import
-import { ref } from "vue";
-import Note from "@/components/notes/Note.vue";
-// data
-const newNote = ref("");
-const newNoteRef = ref(null);
 
-const notes = ref([
-  {
-    id: "1",
-    content:
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Debitismollitia minus consectetur perferendis quis inventore ut corporis eaquerepellendus reiciendis?",
-  },
-  {
-    id: "2",
-    content: "That is a short note , wow",
-  },
-]);
-// method
-const addnewNote = () => {
-  const currentDate = new Date().getTime(),
-    id = currentDate.toString();
-  const note = {
-    id,
-    content: newNote.value,
-  };
-  notes.value.unshift(note);
+<script setup>
+/*
+  imports
+*/
+
+import { ref } from "vue";
+import Note from "@/components/Notes/Note.vue";
+import AddEditNote from "@/components/Notes/AddEditNote.vue";
+import { useStoreNotes } from "@/stores/storeNotes";
+
+/*
+  store
+*/
+
+const storeNotes = useStoreNotes();
+
+/*
+  notes
+*/
+
+const newNote = ref("");
+const addEditNoteRef = ref(null);
+
+const addNote = () => {
+  storeNotes.addNote(newNote.value);
   newNote.value = "";
-  newNoteRef.value.focus();
-};
-// deleteNote
-const deleteNote = (idNote) => {
-  notes.value = notes.value.filter((note) => {
-    return note.id !== idNote;
-  });
+  addEditNoteRef.value.focusTextarea();
 };
 </script>
